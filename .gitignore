@@ -1,0 +1,12 @@
+*.o
+
+# gtags
+GPATH
+GTAGS
+GRTAGS
+
+# submodule
+Glued-Doubly-Linked-List
+
+# binary
+run*
