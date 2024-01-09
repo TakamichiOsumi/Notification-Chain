@@ -6,7 +6,7 @@ MYLIBS	= -lgldll -lpthread
 PROGRAM1	= run_nfc_component_test
 PROGRAM2	= run_nfc_threads
 ALLPROGRAMS	= $(PROGRAM1) $(PROGRAM2)
-# Makefile gets prepared after git submodule commands
+# Makefile is ready after git submodule commands
 MODULE_PREPARED        = ./$(SUBDIRS)/Makefile
 
 all: $(ALLPROGRAMS)
