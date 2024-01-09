@@ -6,12 +6,18 @@ MYLIBS	= -lgldll -lpthread
 PROGRAM1	= run_nfc_component_test
 PROGRAM2	= run_nfc_threads
 ALLPROGRAMS	= $(PROGRAM1) $(PROGRAM2)
-all: $(SUBDIRS) $(ALLPROGRAMS)
+# Makefile gets prepared after git submodule commands
+MODULE_PREPARED        = ./$(SUBDIRS)/Makefile
+
+all: $(ALLPROGRAMS)
 
 # Prerequisite git submodule for notification chain build
 libgldll.a:
-	@bash -c "test -e $(SUBDIRS)/Makefile" || echo "$(SUBDIRS)/Makefile not found. Execute git submodule init&update"
+ifeq ($(MODULE_PREPARED),$(wildcard ./$(SUBDIRS)/Make*))
 	@cd $(SUBDIRS); make; cd ../
+else
+	$(error $(SUBDIRS)/Makefile not found. Run 'git submodule init&update')
+endif
 
 $(PROGRAM1): notification_chain.o notification_chain_util.o routing_table.o
 	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) nfc_threads_test.c $^ -o $@
@@ -38,5 +44,9 @@ test: $(PROGRAM1)
 	@./$(PROGRAM1) &> /dev/null && echo ">>> $$?"
 
 clean:
+ifeq ($(MODULE_PREPARED),$(wildcard ./$(SUBDIRS)/Make*))
 	@cd $(SUBDIRS); make clean; cd ../
 	@rm -f *.o $(ALLPROGRAMS)
+else
+	@rm -f *.o
+endif
