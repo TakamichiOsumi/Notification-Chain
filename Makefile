@@ -1,8 +1,6 @@
 CC	= gcc
 CFLAGS	= -O0 -Wall
 SUBDIRS = Glued-Doubly-Linked-List
-MAKE	= make
-CLEANUP	= make clean
 LIBS	= -L $(CURDIR)/$(SUBDIRS)
 MYLIBS	= -lgldll -lpthread
 PROGRAM1	= run_nfc_component_test
@@ -11,13 +9,9 @@ ALLPROGRAMS	= $(PROGRAM1) $(PROGRAM2)
 all: $(SUBDIRS) $(ALLPROGRAMS)
 
 # Prerequisite git submodule for notification chain build
-$(SUBDIRS):
-	ifneq ($(shell ls | grep $(SUBDIRS)), $(SUBDIRS)) \
-	    "$(error $(SUBDIRS) not found.)" \
-	endif \
-
 libgldll.a:
-	@cd $(SUBDIRS); $(MAKE); cd ../
+	@bash -c "test -e $(SUBDIRS)/Makefile" || echo "$(SUBDIRS)/Makefile not found. Execute git submodule init&update"
+	@cd $(SUBDIRS); make; cd ../
 
 $(PROGRAM1): notification_chain.o notification_chain_util.o routing_table.o
 	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) nfc_threads_test.c $^ -o $@
@@ -44,5 +38,5 @@ test: $(PROGRAM1)
 	@./$(PROGRAM1) &> /dev/null && echo ">>> $$?"
 
 clean:
-	@cd $(SUBDIRS); $(CLEANUP); cd ../
+	@cd $(SUBDIRS); make clean; cd ../
 	@rm -f *.o $(ALLPROGRAMS)
