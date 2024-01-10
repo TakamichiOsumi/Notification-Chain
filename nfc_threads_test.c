@@ -30,18 +30,6 @@ pub_test_cb(void *arg, size_t arg_size,
 }
 
 static void
-nfc_component_check_list_len(notif_chain *chain, int expected){
-    int len;
-
-    len = glthread_list_length(chain->notif_chain_gldll);
-    if (len != expected){
-	fprintf(stderr, "expected the list length to be %d, but it was %d.\n",
-		expected, len);
-	exit(-1);
-    }
-}
-
-static void
 nfc_component_removal_tests(){
     notif_chain *mychain;
 
@@ -58,13 +46,13 @@ nfc_component_removal_tests(){
 			     nfc_create_notif_chain_elem("key5", strlen("key5"), NULL, pub_test_cb, 5));
     nfc_register_notif_chain(mychain,
 			     nfc_create_notif_chain_elem("key6", strlen("key6"), NULL, pub_test_cb, 6));
-    nfc_component_check_list_len(mychain, 6);
+    glthread_check_list_len(mychain->notif_chain_gldll, 6);
     glthread_remove_entry_from_lists(&mychain->notif_chain_gldll, 0, "key5");
-    nfc_component_check_list_len(mychain, 5);
+    glthread_check_list_len(mychain->notif_chain_gldll, 5);
     glthread_remove_entry_from_lists(&mychain->notif_chain_gldll, 0, "key dummy");
-    nfc_component_check_list_len(mychain, 5);
+    glthread_check_list_len(mychain->notif_chain_gldll, 5);
     glthread_remove_entry_from_lists(&mychain->notif_chain_gldll, 0, "key1");
-    nfc_component_check_list_len(mychain, 4);
+    glthread_check_list_len(mychain->notif_chain_gldll, 4);
     glthread_remove_all_list_entries(&mychain->notif_chain_gldll, 0);
 
     if (mychain->notif_chain_gldll != NULL)
