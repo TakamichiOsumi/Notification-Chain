@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -85,4 +86,32 @@ nfc_get_integer_within_range(char *description,
     }while(!success);
 
     return val;
+}
+
+void
+get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
+}
+
+unsigned int
+get_ip_integer_equivalent(char *ip_address){
+    return 0;
+}
+void
+get_abcd_ip_format(unsigned int ip_address, char *output_buffer){
+}
+
+void
+get_network_id(char *ip_addr, char mask, char * output_buffer){
+}
+
+unsigned int
+get_subnet_cardinality(char mask){
+    assert(mask <= 32);
+
+    return pow(2, (32 - mask)) - 2;
+}
+
+int
+check_ip_subnet_membership(char *network_id, char mask, char *check_ip){
+    return 0;
 }
