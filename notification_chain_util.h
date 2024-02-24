@@ -4,6 +4,8 @@
 #include <stdbool.h>
 
 #define BUF_SIZE 1024
+#define OCTET 8
+#define MAX_BIT 32
 
 void *nfc_malloc(size_t size);
 int nfc_strtol(char *str, bool *success);
@@ -12,6 +14,7 @@ int nfc_get_integer_within_range(char *description,
 				 int lower_limit, int upper_limit);
 
 /* Network utilities for future extension */
+void convert_octet_decimal_to_binary(int value, char *binary_mask);
 void get_broadcast_address(char *ip_addr, char mask, char *output_buffer);
 unsigned int get_ip_integer_equivalent(char *ip_address);
 void get_abcd_ip_format(unsigned int ip_address, char *output_buffer);

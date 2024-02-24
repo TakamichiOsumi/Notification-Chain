@@ -89,7 +89,27 @@ nfc_get_integer_within_range(char *description,
 }
 
 void
+convert_octet_decimal_to_binary(int value, char *binary_mask){
+    int i, b, result = 0;
+
+    /* Calculate eight(octet) times */
+    for (i = OCTET - 1; i >= 0; i--){
+	b = pow(2, i);
+	if (value - b >= 0){
+	    result = result + b;
+	    value = value - b;
+	    binary_mask[OCTET - 1 - i] = '1';
+	}else{
+	    binary_mask[OCTET - 1 - i] = '0';
+	}
+    }
+}
+
+void
 get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
+    char binary_mask[MAX_BIT];
+
+    convert_octet_decimal_to_binary(mask, binary_mask);
 }
 
 unsigned int
@@ -108,7 +128,7 @@ unsigned int
 get_subnet_cardinality(char mask){
     assert(mask <= 32);
 
-    return pow(2, (32 - mask)) - 2;
+    return (int) (pow(2, (32 - mask))) - 2;
 }
 
 int
