@@ -90,13 +90,12 @@ nfc_get_integer_within_range(char *description,
 
 void
 convert_octet_decimal_to_binary(int value, char *binary_mask){
-    int i, b, result = 0;
+    int i, b;
 
     /* Calculate eight(octet) times */
     for (i = OCTET - 1; i >= 0; i--){
 	b = pow(2, i);
 	if (value - b >= 0){
-	    result = result + b;
 	    value = value - b;
 	    binary_mask[OCTET - 1 - i] = '1';
 	}else{
@@ -106,10 +105,71 @@ convert_octet_decimal_to_binary(int value, char *binary_mask){
 }
 
 void
-get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
-    char binary_mask[MAX_BIT];
+get_binary_format_subnet_mask(char mask, char *output_buffer){
+    int i;
 
-    convert_octet_decimal_to_binary(mask, binary_mask);
+    memset(output_buffer, '0', IPV4_BIN_SIZE);
+    /*
+     * IPV4_BIN_SIZE - 1 : '\0'
+     * IPV4_BIN_SIZE - 2 : the last bit of the last octet
+     */
+    output_buffer[IPV4_BIN_SIZE - 1] = '\0';
+    for (i = 0; i < IPV4_BIN_SIZE - 2; i++){
+	/* Put dots per each 8 bits */
+	if ((i + 1) % 9 == 0){
+	    output_buffer[i] = '.';
+	}else{
+	    if (mask > 0){
+		output_buffer[i] = '1';
+		mask -= 1;
+	    }
+	}
+    }
+}
+
+int
+find_dot_index(char *str, int start, int end){
+    int i = 0;
+
+    for (i = start; i < end; i++){
+	if (str[i] == '.'){
+	    return i;
+	}
+    }
+
+    return -1;
+}
+
+void
+get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
+    char copied_ip_addr[IPV4_DEC_MAX_SIZE];
+    char *octets[NUM_OF_OCTETS];
+    int i, start_pos, dot_index, last_char_index = strlen(ip_addr) - 1;
+
+    i = start_pos = 0;
+    strncpy(copied_ip_addr, ip_addr, IPV4_DEC_MAX_SIZE);
+
+    /* Until the last octet, find dot index and store each decimal number */
+    for (i = 0; i < NUM_OF_OCTETS - 1; i++){
+	if ((dot_index = find_dot_index(copied_ip_addr,
+					start_pos, last_char_index)) == -1){
+	    printf("invalid input string for ip v4 format\n");
+	    exit(-1);
+	}
+	copied_ip_addr[dot_index] = '\0';
+	octets[i] = &copied_ip_addr[start_pos];
+	printf("octets[%d]=%s\n", i, octets[i]);
+	start_pos = dot_index + 1;
+    }
+
+    /* Process the last octet */
+    octets[NUM_OF_OCTETS - 1] = &copied_ip_addr[start_pos];
+    printf("octets[%d]=%s\n", NUM_OF_OCTETS - 1, octets[NUM_OF_OCTETS - 1]);
+}
+
+void
+get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
+    ;
 }
 
 unsigned int
