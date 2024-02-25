@@ -61,16 +61,27 @@ void
 test_binary_format_ipaddr(void)
 {
     char *ip;
+    char buf[IPV4_BIN_SIZE];
+
+    memset(buf, '\0', IPV4_BIN_SIZE);
 
     /* Class A */
     ip = "10.67.95.255";
-    get_binary_format_ipaddr(ip, NULL);
+    get_binary_format_ipaddr(ip, buf);
+    printf("ip v4 : %s, binary format : %s\n",
+	   ip, buf);
+    
     /* Class B */
     ip = "172.16.45.8";
-    get_binary_format_ipaddr(ip, NULL);
+    get_binary_format_ipaddr(ip, buf);
+    printf("ip v4 : %s, binary format : %s\n",
+	   ip, buf);
+
     /* Class C */
     ip = "192.168.1.128";
-    get_binary_format_ipaddr(ip, NULL);
+    get_binary_format_ipaddr(ip, buf);
+    printf("ip v4 : %s, binary format : %s\n",
+	   ip, buf);
 }
 
 int

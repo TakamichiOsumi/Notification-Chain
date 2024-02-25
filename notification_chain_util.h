@@ -7,9 +7,11 @@
 #define OCTET 8
 #define NUM_OF_OCTETS 4
 #define MAX_BIT (OCTET * NUM_OF_OCTETS)
-#define OCTET_SIZE ((int) strlen("XXXXXXXX") + 1)
-#define IPV4_DEC_MAX_SIZE ((int) strlen("XXX.XXX.XXX.XXX") + 1)
-#define IPV4_BIN_SIZE ((int) strlen("XXXXXXXX.XXXXXXXX.XXXXXXXX.XXXXXXXX") + 1)
+
+/* Define fixed length for various formats, including '\0' */
+#define OCTET_SIZE (strlen("XXXXXXXX") + 1)
+#define IPV4_DEC_MAX_SIZE (strlen("XXX.XXX.XXX.XXX") + 1)
+#define IPV4_BIN_SIZE (strlen("XXXXXXXX.XXXXXXXX.XXXXXXXX.XXXXXXXX") + 1)
 
 void *nfc_malloc(size_t size);
 int nfc_strtol(char *str, bool *success);

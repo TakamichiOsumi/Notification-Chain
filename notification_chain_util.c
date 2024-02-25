@@ -143,28 +143,59 @@ find_dot_index(char *str, int start, int end){
 void
 get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
     char copied_ip_addr[IPV4_DEC_MAX_SIZE];
-    char *octets[NUM_OF_OCTETS];
+    char *dec_octet_ary[NUM_OF_OCTETS];
+    char *p;
+    char one_octet_binary_format[OCTET_SIZE];
     int i, start_pos, dot_index, last_char_index = strlen(ip_addr) - 1;
+    int dec_val;
+    bool success = false;
 
-    i = start_pos = 0;
+    start_pos = 0;
     strncpy(copied_ip_addr, ip_addr, IPV4_DEC_MAX_SIZE);
+    one_octet_binary_format[OCTET_SIZE - 1] = '\0';
 
-    /* Until the last octet, find dot index and store each decimal number */
-    for (i = 0; i < NUM_OF_OCTETS - 1; i++){
-	if ((dot_index = find_dot_index(copied_ip_addr,
+    for (i = 0; i < NUM_OF_OCTETS; i++){
+	/*
+	 * Until the last octet conversion, find the dot delimiter index.
+	 * For the last octet, process input string until the termination char.
+	 */
+	if (i < NUM_OF_OCTETS - 1){
+	    if ((dot_index = find_dot_index(copied_ip_addr,
 					start_pos, last_char_index)) == -1){
+		printf("invalid input string for ip v4 format\n");
+		exit(-1);
+	    }
+	}else
+	    dot_index = strlen(ip_addr);
+
+	/* Make one string in the copied buffer */
+	copied_ip_addr[dot_index] = '\0';
+	/* And, save it as an one string */
+	p = &copied_ip_addr[start_pos];
+
+	dec_val = nfc_strtol(p, &success);
+
+	if (!success){
 	    printf("invalid input string for ip v4 format\n");
 	    exit(-1);
 	}
-	copied_ip_addr[dot_index] = '\0';
-	octets[i] = &copied_ip_addr[start_pos];
-	printf("octets[%d]=%s\n", i, octets[i]);
+
+	convert_octet_decimal_to_binary(dec_val, one_octet_binary_format);
+
+	printf("%d was convert to binary format %s\n",
+	       dec_val, one_octet_binary_format);
+
 	start_pos = dot_index + 1;
+
+	dec_octet_ary[i] = one_octet_binary_format;
+	printf("dec_octet_ary[%d]=%s\n", i, dec_octet_ary[i]);
     }
 
-    /* Process the last octet */
-    octets[NUM_OF_OCTETS - 1] = &copied_ip_addr[start_pos];
-    printf("octets[%d]=%s\n", NUM_OF_OCTETS - 1, octets[NUM_OF_OCTETS - 1]);
+    printf("debug : %i => %p\n", 0, dec_octet_ary[0]);
+    printf("debug : %i => %p\n", 1, dec_octet_ary[1]);
+    snprintf(output_buffer, IPV4_BIN_SIZE, "%s.%s.%s.%s",
+    	     dec_octet_ary[0], dec_octet_ary[1],
+    	     dec_octet_ary[2], dec_octet_ary[3]);
 }
 
 void
