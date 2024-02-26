@@ -124,13 +124,24 @@ test_network_id(void){
 
 void
 test_broadcast_address(void){
-    char *ip = "192.168.1.10";
-    char mask = 25;
+    char *ip;
+    char mask;
     char *answer_broadcast_ip, broadcast_ip[IPV4_DEC_MAX_SIZE];
     int len1, len2;
 
+    ip = "192.168.1.10";
+    mask = 25;
     get_broadcast_address(ip, mask, broadcast_ip);
     answer_broadcast_ip = "192.168.1.127";
+    len1 = strlen(answer_broadcast_ip);
+    len2 = strlen(broadcast_ip);
+    compare_strings(answer_broadcast_ip, broadcast_ip,
+		    len1 <= len2 ? len1 : len2);
+
+    ip = "10.8.60.122";
+    mask = 12;
+    get_broadcast_address(ip, mask, broadcast_ip);
+    answer_broadcast_ip = "10.15.255.255";
     len1 = strlen(answer_broadcast_ip);
     len2 = strlen(broadcast_ip);
     compare_strings(answer_broadcast_ip, broadcast_ip,
