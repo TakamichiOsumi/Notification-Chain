@@ -148,6 +148,32 @@ test_broadcast_address(void){
 		    len1 <= len2 ? len1 : len2);
 }
 
+void
+compare_integers(char *ip, unsigned int value){
+    bool valid;
+    int tmp;
+
+    tmp = get_ip_integer_equivalent(ip, &valid);
+    if (valid == false){
+	fprintf(stderr,
+		"invalid ipv4 format of the input\n");
+	exit(-1);
+    }
+
+    if (tmp != value){
+	fprintf(stderr,
+		"the integer value was expected to be '%d', but it was '%d'\n",
+		value, tmp);
+	exit(-1);
+    }
+}
+
+void
+test_ip_equivalent_integer(void){
+    compare_integers("192.168.60.70", 3232250950);
+    compare_integers("10.10.128.100", 168460388);
+}
+
 int
 main(int argc, char **argv){
 
@@ -157,6 +183,7 @@ main(int argc, char **argv){
     test_subnet_cardinality_calculation();
     test_network_id();
     test_broadcast_address();
+    test_ip_equivalent_integer();
 
     return 0;
 }

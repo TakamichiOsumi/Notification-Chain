@@ -276,9 +276,53 @@ get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
 }
 
 unsigned int
-get_ip_integer_equivalent(char *ip_address){
-    return 0;
+get_ip_integer_equivalent(char *ip_address, bool *valid){
+    unsigned long result = 0;
+    char *p, copied_ip_addr[IPV4_DEC_MAX_SIZE];
+    int iter, decimal_val, start_pos = 0, dot_index;
+    bool success = false;
+
+    strncpy(copied_ip_addr, ip_address, IPV4_DEC_MAX_SIZE);
+
+    for (iter = 0; iter < NUM_OF_OCTETS; iter++){
+
+	/* Find the dot character at first */
+	if (iter == NUM_OF_OCTETS - 1){
+	    /*
+	     * The last octet doesn't have a dot at the end.
+	     * Its substitute is the string length.
+	     */
+	    dot_index = strlen(ip_address);
+	}else{
+	    if ((dot_index = find_dot_index(copied_ip_addr,
+					    start_pos, strlen(ip_address) - 1)) == -1){
+		fprintf(stderr, "invalid input string for ip v4 format\n");
+		*valid = false;
+		return 0;
+	    }
+	}
+
+	/* Make one string, by utilizing the copied buffer */
+	p = &copied_ip_addr[start_pos];
+	copied_ip_addr[dot_index] = '\0';
+
+	/* Convert the string decimal value to integer */
+	decimal_val = nfc_strtol(p, &success);
+	if (!success){
+	    fprintf(stderr, "failed to convert a parsed string\n");
+	    *valid = false;
+	    return 0;
+	}
+
+	result += decimal_val * pow(256, (NUM_OF_OCTETS - 1 - iter));
+
+	start_pos = dot_index + 1;
+    }
+
+    *valid = true;
+    return result;
 }
+
 void
 get_abcd_ip_format(unsigned int ip_address, char *output_buffer){
 }
