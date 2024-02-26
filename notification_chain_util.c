@@ -227,10 +227,9 @@ get_abcd_ip_format(unsigned int ip_address, char *output_buffer){
  */
 void
 get_decimal_ipaddr_from_binary(char *binary_ipaddr, char *output_buffer){
-    char all_binary_octets[NUM_OF_OCTETS][OCTET_SIZE];
     char *p, copied_binary_ipaddr[IPV4_BIN_SIZE];
     char decimal_buf[IPV4_DEC_MAX_SIZE];
-    int i, decimal_val, write_shift_index = 0, terminal_index = 0;
+    int i, decimal_val, terminal_index = 0;
 
     strncpy(copied_binary_ipaddr, binary_ipaddr, IPV4_BIN_SIZE);
 
@@ -241,24 +240,15 @@ get_decimal_ipaddr_from_binary(char *binary_ipaddr, char *output_buffer){
 	/* Replace dot delimiter with termination character */
 	copied_binary_ipaddr[((i + 1) * 9) - 1] = '\0';
 
-	/* Now, we got one octet */
-	strncpy(all_binary_octets[i], p, OCTET_SIZE);
-
-	/* Convert the octet to decimal notation and make it string */
+	/* Convert the octet sequence to decimal notation and make it string */
 	decimal_val = convert_octet_binary_to_decimal(p);
 
+	/* Change the decimal value from integer to string */
+	sprintf(decimal_buf, (i == NUM_OF_OCTETS - 1) ? "%d" : "%d.", decimal_val);
+	terminal_index += strlen(decimal_buf);
+
 	/* Paste the string decimal notation to the output buffer */
-	if (i == NUM_OF_OCTETS - 1){
-	    sprintf(decimal_buf, "%d", decimal_val);
-	    write_shift_index = strlen(decimal_buf);
-	    strlcat(output_buffer, decimal_buf, IPV4_DEC_MAX_SIZE);
-	    terminal_index += write_shift_index;
-	}else{
-	    sprintf(decimal_buf, "%d.", decimal_val);
-	    write_shift_index = strlen(decimal_buf);
-	    strlcat(output_buffer, decimal_buf, IPV4_DEC_MAX_SIZE);
-	    terminal_index += write_shift_index;
-	}
+	strlcat(output_buffer, decimal_buf, IPV4_DEC_MAX_SIZE);
     }
 
     /* Write the termination character in the output buffer */
