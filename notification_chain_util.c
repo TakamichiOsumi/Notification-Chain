@@ -276,6 +276,13 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
     int i;
     char c1, c2;
 
+    /*
+     * For safe strlcat(), insert a terminal character.
+     * Otherwise, newly created strings for the output will be
+     * pasted after some junk characters in the buffer.
+     */
+    output_buffer[0] = '\0';
+
     get_binary_format_ipaddr(ip_addr, binary_ipv4);
     get_binary_format_subnet_mask(mask, binary_subnet_mask);
 

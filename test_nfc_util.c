@@ -94,7 +94,6 @@ test_network_id(void){
     ip = "192.168.1.128";
     mask = 24;
     answer_networkid = "192.168.1.0";
-    memset(AND_op_result, '\0', IPV4_DEC_MAX_SIZE);
 
     get_network_id(ip, mask, AND_op_result);
     len1 = strlen(answer_networkid);
@@ -105,7 +104,6 @@ test_network_id(void){
     ip = "172.16.45.8";
     mask = 22;
     answer_networkid = "172.16.44.0";
-    memset(AND_op_result, '\0', IPV4_DEC_MAX_SIZE);
 
     get_network_id(ip, mask, AND_op_result);
     len1 = strlen(answer_networkid);
@@ -116,13 +114,11 @@ test_network_id(void){
     ip = "10.8.60.122";
     mask = 10;
     answer_networkid = "10.0.0.0";
-    memset(AND_op_result, '\0', IPV4_DEC_MAX_SIZE);
 
     get_network_id(ip, mask, AND_op_result);
     len1 = strlen(answer_networkid);
     len2 = strlen(AND_op_result);
     compare_strings(answer_networkid, AND_op_result, len1 <= len2 ? len1 : len2);
-
 }
 
 int
