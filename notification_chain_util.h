@@ -23,10 +23,12 @@ int nfc_get_integer_within_range(char *description,
 void convert_octet_decimal_to_binary(int value, char *binary_mask);
 void get_broadcast_address(char *ip_addr, char mask, char *output_buffer);
 void get_binary_format_subnet_mask(char mask, char *output_buffer);
+void get_network_id(char *ip_addr, char mask, char * output_buffer);
+
 void get_binary_format_ipaddr(char *ip_addr, char *output_buffer);
 unsigned int get_ip_integer_equivalent(char *ip_address);
 void get_abcd_ip_format(unsigned int ip_address, char *output_buffer);
-void get_network_id(char *ip_addr, char mask, char * output_buffer);
+
 unsigned int get_subnet_cardinality(char mask);
 int check_ip_subnet_membership(char *network_id, char mask, char *check_ip);
 

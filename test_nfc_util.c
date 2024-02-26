@@ -82,6 +82,16 @@ test_binary_format_ipaddr(void)
     compare_strings("11000000.10101000.00000001.10000000", buf);
 }
 
+void
+test_network_id(void){
+    char AND_op_result[IPV4_BIN_SIZE];
+    char *ip, mask;
+
+    ip = "192.168.1.128";
+    mask = 24;
+    get_network_id(ip, mask, AND_op_result);
+}
+
 int
 main(int argc, char **argv){
 
@@ -89,6 +99,7 @@ main(int argc, char **argv){
     test_binary_format_ipaddr();
     test_broadcast_address_calculation();
     test_subnet_cardinality_calculation();
+    test_network_id();
 
     return 0;
 }

@@ -207,8 +207,42 @@ void
 get_abcd_ip_format(unsigned int ip_address, char *output_buffer){
 }
 
+/*
+ * The caller must ensure 'output_buffer' has the length of IPV4_BIN_SIZE.
+ */
 void
-get_network_id(char *ip_addr, char mask, char * output_buffer){
+get_network_id(char *ip_addr, char mask, char *output_buffer){
+    char binary_ipv4[IPV4_BIN_SIZE];
+    char binary_subnet_mask[IPV4_BIN_SIZE];
+    int i;
+    char c1, c2;
+
+    get_binary_format_ipaddr(ip_addr, binary_ipv4);
+    get_binary_format_subnet_mask(mask, binary_subnet_mask);
+
+    for (i = 0; i < IPV4_BIN_SIZE - 1; i++){
+	c1 = binary_ipv4[i];
+	c2 = binary_subnet_mask[i];
+
+	if (c1 == '.' && c2 == '.'){
+	    output_buffer[i] = '.';
+	    continue;
+	}
+
+	if (c1 == '1' && c2 == '1'){
+	    output_buffer[i] = '1';
+	}else if ((c1 == '1' && c2 == '0') ||
+		 (c1 == '0' && c2 == '1') ||
+		 (c1 == '0' && c2 == '0'))
+	    output_buffer[i] = '0';
+	else
+	    assert(0);
+    }
+
+    printf("debug : input ip v4 addr   : %s\n", ip_addr);
+    printf("debug : binary ipv4        : %s\n", binary_ipv4);
+    printf("debug : binary subnet mask : %s\n", binary_subnet_mask);
+    printf("debug : AND op result      : %s\n", output_buffer);
 }
 
 unsigned int
