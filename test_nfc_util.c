@@ -126,8 +126,15 @@ void
 test_broadcast_address(void){
     char *ip = "192.168.1.10";
     char mask = 25;
+    char *answer_broadcast_ip, broadcast_ip[IPV4_DEC_MAX_SIZE];
+    int len1, len2;
 
-    get_broadcast_address(ip, mask, NULL);
+    get_broadcast_address(ip, mask, broadcast_ip);
+    answer_broadcast_ip = "192.168.1.127";
+    len1 = strlen(answer_broadcast_ip);
+    len2 = strlen(broadcast_ip);
+    compare_strings(answer_broadcast_ip, broadcast_ip,
+		    len1 <= len2 ? len1 : len2);
 }
 
 int
@@ -138,7 +145,6 @@ main(int argc, char **argv){
     test_broadcast_address_calculation();
     test_subnet_cardinality_calculation();
     test_network_id();
-
     test_broadcast_address();
 
     return 0;

@@ -237,15 +237,42 @@ make_mask_complement(char mask, char *mask_complement){
 void
 get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
     char network_id[IPV4_DEC_MAX_SIZE];
+    char binary_network_id[IPV4_BIN_SIZE];
     char mask_complement[IPV4_BIN_SIZE];
+    char or_result[IPV4_BIN_SIZE];
+    int i;
 
+    output_buffer[0] = '\0';
     memset(network_id, '\0', IPV4_DEC_MAX_SIZE);
+    memset(binary_network_id, '\0', IPV4_BIN_SIZE);
     memset(mask_complement, '\0', IPV4_BIN_SIZE);
+    memset(or_result, '\0', IPV4_BIN_SIZE);
 
     get_network_id(ip_addr, mask, network_id);
+    get_binary_format_ipaddr(network_id, binary_network_id);
     make_mask_complement(mask, mask_complement);
 
-    printf("mask complement for %d : %s\n", mask, mask_complement);
+    /* printf("debug : binary network id = %s\n", binary_network_id); */
+    /* printf("debug : mask complement   = %s\n", mask_complement); */
+
+    /* OR operation */
+    for (i = 0; i < IPV4_BIN_SIZE - 1; i++){
+	if (binary_network_id[i] == '.' && mask_complement[i] == '.'){
+	    or_result[i] = '.';
+	    continue;
+	}
+
+	if (binary_network_id[i] == '1' || mask_complement[i] == '1'){
+	    or_result[i] = '1';
+	}else{
+	    or_result[i] = '0';
+	}
+    }
+    or_result[IPV4_BIN_SIZE - 1] = '\0';
+
+    /* printf("debug : or_result = %s\n", or_result); */
+
+    get_decimal_ipaddr_from_binary(or_result, output_buffer);
 }
 
 unsigned int
@@ -315,6 +342,7 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
     get_binary_format_ipaddr(ip_addr, binary_ipv4);
     get_binary_format_subnet_mask(mask, binary_subnet_mask);
 
+    /* AND operation */
     for (i = 0; i < IPV4_BIN_SIZE - 1; i++){
 	c1 = binary_ipv4[i];
 	c2 = binary_subnet_mask[i];
