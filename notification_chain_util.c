@@ -104,6 +104,20 @@ convert_octet_decimal_to_binary(int value, char *binary_mask){
     }
 }
 
+int
+convert_octet_binary_to_decimal(char *binary){
+    int i, sum = 0;
+
+    /* Calculate eight(octet) times */
+    for (i = 0; i < OCTET; i++){
+	if (binary[i] == '1'){
+	    sum += pow(2, OCTET - 1 - i);
+	}
+    }
+
+    return sum;
+}
+
 void
 get_binary_format_subnet_mask(char mask, char *output_buffer){
     int i;
@@ -207,6 +221,34 @@ void
 get_abcd_ip_format(unsigned int ip_address, char *output_buffer){
 }
 
+
+/*
+ * The caller must ensure 'output_buffer' has the length of IPV4_DEC_MAX_SIZE.
+ */
+void
+get_decimal_ipaddr_from_binary(char *binary_ipaddr, char *output_buffer){
+    char all_binary_octets[NUM_OF_OCTETS][OCTET_SIZE];
+    char *p, copied_binary_ipaddr[IPV4_BIN_SIZE];
+    int i, decimal_val, write_index = 0;
+
+    strncpy(copied_binary_ipaddr, binary_ipaddr, IPV4_BIN_SIZE);
+
+    for (i = 0; i < NUM_OF_OCTETS; i++){
+	/* Get one octet sequence */
+	p = &copied_binary_ipaddr[(i * 9)];
+	/* Replace dot delimiter with termination character */
+	copied_binary_ipaddr[((i + 1) * 9) - 1] = '\0';
+
+	/* Now, we got one octet */
+	strncpy(all_binary_octets[i], p, OCTET_SIZE);
+
+	/* Conver the octet to decimal notation */
+	decimal_val = convert_octet_binary_to_decimal(p);
+	/* printf("convert binary format octet to decimal : %s => %d\n",
+	   p, decimal_val); */
+    }
+}
+
 /*
  * The caller must ensure 'output_buffer' has the length of IPV4_BIN_SIZE.
  */
@@ -214,6 +256,7 @@ void
 get_network_id(char *ip_addr, char mask, char *output_buffer){
     char binary_ipv4[IPV4_BIN_SIZE];
     char binary_subnet_mask[IPV4_BIN_SIZE];
+    char binary_network_id[IPV4_BIN_SIZE];
     int i;
     char c1, c2;
 
@@ -225,24 +268,26 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
 	c2 = binary_subnet_mask[i];
 
 	if (c1 == '.' && c2 == '.'){
-	    output_buffer[i] = '.';
+	    binary_network_id[i] = '.';
 	    continue;
 	}
 
 	if (c1 == '1' && c2 == '1'){
-	    output_buffer[i] = '1';
+	    binary_network_id[i] = '1';
 	}else if ((c1 == '1' && c2 == '0') ||
 		 (c1 == '0' && c2 == '1') ||
 		 (c1 == '0' && c2 == '0'))
-	    output_buffer[i] = '0';
+	    binary_network_id[i] = '0';
 	else
 	    assert(0);
     }
 
-    printf("debug : input ip v4 addr   : %s\n", ip_addr);
+    printf("debug : input ipv4 addr   : %s\n", ip_addr);
     printf("debug : binary ipv4        : %s\n", binary_ipv4);
     printf("debug : binary subnet mask : %s\n", binary_subnet_mask);
-    printf("debug : AND op result      : %s\n", output_buffer);
+    printf("debug : AND op result      : %s\n", binary_network_id);
+
+    get_decimal_ipaddr_from_binary(binary_network_id, output_buffer);
 }
 
 unsigned int
