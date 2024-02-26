@@ -266,6 +266,7 @@ get_decimal_ipaddr_from_binary(char *binary_ipaddr, char *output_buffer){
     char decimal_buf[IPV4_DEC_MAX_SIZE];
     int i, decimal_val, terminal_index = 0;
 
+    memset(copied_binary_ipaddr, '\0', IPV4_BIN_SIZE);
     strncpy(copied_binary_ipaddr, binary_ipaddr, IPV4_BIN_SIZE);
 
     for (i = 0; i < NUM_OF_OCTETS; i++){
@@ -303,10 +304,13 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
 
     /*
      * For safe strlcat(), insert a terminal character.
-     * Otherwise, newly created strings for the output will be
-     * pasted after some junk characters in the buffer.
+     *
+     * Otherwise, newly created strings for the output
+     * will be pasted after some junk characters in the buffer.
      */
     output_buffer[0] = '\0';
+    memset(binary_subnet_mask, '\0', IPV4_BIN_SIZE);
+    memset(binary_network_id, '\0', IPV4_BIN_SIZE);
 
     get_binary_format_ipaddr(ip_addr, binary_ipv4);
     get_binary_format_subnet_mask(mask, binary_subnet_mask);
@@ -329,11 +333,13 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
 	else
 	    assert(0);
     }
+    /* Terminate the string */
+    binary_network_id[IPV4_BIN_SIZE - 1] = '\0';
 
-    printf("debug : Input IPv4 address    : %s\n", ip_addr);
-    printf("debug : Binary IPv4 address   : %s\n", binary_ipv4);
-    printf("debug : Binary subnet mask    : %s\n", binary_subnet_mask);
-    printf("debug : Execute AND operation : %s\n", binary_network_id);
+    printf("debug : Input IPv4 address    : '%s'\n", ip_addr);
+    printf("debug : Binary IPv4 address   : '%s'\n", binary_ipv4);
+    printf("debug : Binary subnet mask    : '%s'\n", binary_subnet_mask);
+    printf("debug : Execute AND operation : '%s'\n", binary_network_id);
 
     get_decimal_ipaddr_from_binary(binary_network_id, output_buffer);
 }
