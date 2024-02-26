@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 256
 #define OCTET 8
 #define NUM_OF_OCTETS 4
 #define MAX_BIT (OCTET * NUM_OF_OCTETS)

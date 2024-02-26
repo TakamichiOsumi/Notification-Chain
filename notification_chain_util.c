@@ -229,24 +229,40 @@ void
 get_decimal_ipaddr_from_binary(char *binary_ipaddr, char *output_buffer){
     char all_binary_octets[NUM_OF_OCTETS][OCTET_SIZE];
     char *p, copied_binary_ipaddr[IPV4_BIN_SIZE];
-    int i, decimal_val, write_index = 0;
+    char decimal_buf[IPV4_DEC_MAX_SIZE];
+    int i, decimal_val, write_shift_index = 0, terminal_index = 0;
 
     strncpy(copied_binary_ipaddr, binary_ipaddr, IPV4_BIN_SIZE);
 
     for (i = 0; i < NUM_OF_OCTETS; i++){
 	/* Get one octet sequence */
 	p = &copied_binary_ipaddr[(i * 9)];
+
 	/* Replace dot delimiter with termination character */
 	copied_binary_ipaddr[((i + 1) * 9) - 1] = '\0';
 
 	/* Now, we got one octet */
 	strncpy(all_binary_octets[i], p, OCTET_SIZE);
 
-	/* Conver the octet to decimal notation */
+	/* Convert the octet to decimal notation and make it string */
 	decimal_val = convert_octet_binary_to_decimal(p);
-	/* printf("convert binary format octet to decimal : %s => %d\n",
-	   p, decimal_val); */
+
+	/* Paste the string decimal notation to the output buffer */
+	if (i == NUM_OF_OCTETS - 1){
+	    sprintf(decimal_buf, "%d", decimal_val);
+	    write_shift_index = strlen(decimal_buf);
+	    strlcat(output_buffer, decimal_buf, IPV4_DEC_MAX_SIZE);
+	    terminal_index += write_shift_index;
+	}else{
+	    sprintf(decimal_buf, "%d.", decimal_val);
+	    write_shift_index = strlen(decimal_buf);
+	    strlcat(output_buffer, decimal_buf, IPV4_DEC_MAX_SIZE);
+	    terminal_index += write_shift_index;
+	}
     }
+
+    /* Write the termination character in the output buffer */
+    output_buffer[terminal_index] = '\0';
 }
 
 /*
@@ -282,8 +298,8 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
 	    assert(0);
     }
 
-    printf("debug : input ipv4 addr   : %s\n", ip_addr);
-    printf("debug : binary ipv4        : %s\n", binary_ipv4);
+    printf("debug : input IPv4 addr    : %s\n",  ip_addr);
+    printf("debug : binary IPv4        : %s\n", binary_ipv4);
     printf("debug : binary subnet mask : %s\n", binary_subnet_mask);
     printf("debug : AND op result      : %s\n", binary_network_id);
 
