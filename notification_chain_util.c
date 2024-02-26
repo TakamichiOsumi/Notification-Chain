@@ -128,7 +128,7 @@ get_binary_format_subnet_mask(char mask, char *output_buffer){
      * IPV4_BIN_SIZE - 2 : the last bit of the last octet
      */
     output_buffer[IPV4_BIN_SIZE - 1] = '\0';
-    for (i = 0; i < IPV4_BIN_SIZE - 2; i++){
+    for (i = 0; i < IPV4_BIN_SIZE - 1; i++){
 	/* Put dots per each 8 bits */
 	if ((i + 1) % 9 == 0){
 	    output_buffer[i] = '.';
@@ -206,11 +206,46 @@ get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
     snprintf(output_buffer, IPV4_BIN_SIZE, "%s.%s.%s.%s",
 	     all_binary_octets[0], all_binary_octets[1],
 	     all_binary_octets[2], all_binary_octets[3]);
+    output_buffer[IPV4_BIN_SIZE - 1] = '\0';
 }
 
 void
+make_mask_complement(char mask, char *mask_complement){
+    int i, num_of_zeros;
+
+    num_of_zeros = 32 - (32 - mask);
+
+    for (i = 0; i < IPV4_BIN_SIZE - 1; i++){
+	/* Put dots per each 8 bits */
+	if ((i + 1) % 9 == 0){
+	    mask_complement[i] = '.';
+	}else{
+	    if (num_of_zeros > 0){
+		mask_complement[i] = '0';
+		num_of_zeros--;
+	    }else{
+		mask_complement[i] = '1';
+	    }
+	}
+    }
+
+}
+
+/*
+ * The caller must ensure 'output_buffer' has the length of IPV4_DEC_MAX_SIZE;
+ */
+void
 get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
-    ;
+    char network_id[IPV4_DEC_MAX_SIZE];
+    char mask_complement[IPV4_BIN_SIZE];
+
+    memset(network_id, '\0', IPV4_DEC_MAX_SIZE);
+    memset(mask_complement, '\0', IPV4_BIN_SIZE);
+
+    get_network_id(ip_addr, mask, network_id);
+    make_mask_complement(mask, mask_complement);
+
+    printf("mask complement for %d : %s\n", mask, mask_complement);
 }
 
 unsigned int
@@ -295,10 +330,10 @@ get_network_id(char *ip_addr, char mask, char *output_buffer){
 	    assert(0);
     }
 
-    printf("debug : input IPv4 addr    : %s\n",  ip_addr);
-    printf("debug : binary IPv4        : %s\n", binary_ipv4);
-    printf("debug : binary subnet mask : %s\n", binary_subnet_mask);
-    printf("debug : AND op result      : %s\n", binary_network_id);
+    printf("debug : Input IPv4 address    : %s\n", ip_addr);
+    printf("debug : Binary IPv4 address   : %s\n", binary_ipv4);
+    printf("debug : Binary subnet mask    : %s\n", binary_subnet_mask);
+    printf("debug : Execute AND operation : %s\n", binary_network_id);
 
     get_decimal_ipaddr_from_binary(binary_network_id, output_buffer);
 }

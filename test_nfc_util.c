@@ -23,15 +23,15 @@ test_subnet_mask(void){
     compare_strings("11111111.00000000.00000000.00000000", bit_ipv4, IPV4_BIN_SIZE);
     get_binary_format_subnet_mask(10, bit_ipv4);
     compare_strings("11111111.11000000.00000000.00000000", bit_ipv4, IPV4_BIN_SIZE);
-
+    get_binary_format_subnet_mask(31, bit_ipv4);
+    compare_strings("11111111.11111111.11111111.11111110", bit_ipv4, IPV4_BIN_SIZE);
 }
 
 static void
 test_broadcast_address_calculation(){
     char bit_flags[OCTET + 1]; /* include "\0" */
-    char bin_ipv4[MAX_BIT + 1];
 
-    memset(bit_flags, '\0', OCTET + 1);
+    memset(bit_flags, '\0', OCTET_SIZE);
 
     convert_octet_decimal_to_binary(10, bit_flags);
     compare_strings("00001010", bit_flags, OCTET_SIZE);
@@ -41,8 +41,6 @@ test_broadcast_address_calculation(){
     compare_strings("11111111", bit_flags, OCTET_SIZE);
     convert_octet_decimal_to_binary(188, bit_flags);
     compare_strings("10111100", bit_flags, OCTET_SIZE);
-
-    get_broadcast_address("192.168.1.3", 24, bin_ipv4);
 }
 
 void
@@ -98,7 +96,8 @@ test_network_id(void){
     get_network_id(ip, mask, AND_op_result);
     len1 = strlen(answer_networkid);
     len2 = strlen(AND_op_result);
-    compare_strings(answer_networkid, AND_op_result, len1 <= len2 ? len1 : len2);
+    compare_strings(answer_networkid, AND_op_result,
+		    len1 <= len2 ? len1 : len2);
 
     /* Class B */
     ip = "172.16.45.8";
@@ -108,7 +107,8 @@ test_network_id(void){
     get_network_id(ip, mask, AND_op_result);
     len1 = strlen(answer_networkid);
     len2 = strlen(AND_op_result);
-    compare_strings(answer_networkid, AND_op_result, len1 <= len2 ? len1 : len2);
+    compare_strings(answer_networkid, AND_op_result,
+		    len1 <= len2 ? len1 : len2);
 
     /* Class A */
     ip = "10.8.60.122";
@@ -118,7 +118,16 @@ test_network_id(void){
     get_network_id(ip, mask, AND_op_result);
     len1 = strlen(answer_networkid);
     len2 = strlen(AND_op_result);
-    compare_strings(answer_networkid, AND_op_result, len1 <= len2 ? len1 : len2);
+    compare_strings(answer_networkid, AND_op_result,
+		    len1 <= len2 ? len1 : len2);
+}
+
+void
+test_broadcast_address(void){
+    char *ip = "192.168.1.10";
+    char mask = 25;
+
+    get_broadcast_address(ip, mask, NULL);
 }
 
 int
@@ -129,6 +138,8 @@ main(int argc, char **argv){
     test_broadcast_address_calculation();
     test_subnet_cardinality_calculation();
     test_network_id();
+
+    test_broadcast_address();
 
     return 0;
 }
