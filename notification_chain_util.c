@@ -140,62 +140,58 @@ find_dot_index(char *str, int start, int end){
     return -1;
 }
 
+/*
+ * The caller must ensure 'output_buffer' has the length of IPV4_BIN_SIZE.
+ */
 void
 get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
-    char copied_ip_addr[IPV4_DEC_MAX_SIZE];
-    char *dec_octet_ary[NUM_OF_OCTETS];
-    char *p;
-    char one_octet_binary_format[OCTET_SIZE];
-    int i, start_pos, dot_index, last_char_index = strlen(ip_addr) - 1;
-    int dec_val;
+    char *p, copied_ip_addr[IPV4_DEC_MAX_SIZE],
+	all_binary_octets[NUM_OF_OCTETS][OCTET_SIZE];
+    int iter, decimal_val, start_pos = 0, dot_index,
+	last_char_index = strlen(ip_addr) - 1;
     bool success = false;
 
-    start_pos = 0;
+    /* Create a copied input to make the output */
     strncpy(copied_ip_addr, ip_addr, IPV4_DEC_MAX_SIZE);
-    one_octet_binary_format[OCTET_SIZE - 1] = '\0';
 
-    for (i = 0; i < NUM_OF_OCTETS; i++){
-	/*
-	 * Until the last octet conversion, find the dot delimiter index.
-	 * For the last octet, process input string until the termination char.
-	 */
-	if (i < NUM_OF_OCTETS - 1){
+    /*
+     * Until the last octet conversion, find the dot delimiter index.
+     * For the last octet, process input string until the termination character,
+     * since there is no dot any more.
+     */
+    for (iter = 0; iter < NUM_OF_OCTETS; iter++){
+
+	if (iter == NUM_OF_OCTETS - 1){
+	    dot_index = strlen(ip_addr);
+	}else{
 	    if ((dot_index = find_dot_index(copied_ip_addr,
 					start_pos, last_char_index)) == -1){
-		printf("invalid input string for ip v4 format\n");
-		exit(-1);
+		fprintf(stderr, "invalid input string for ip v4 format\n");
+		return;
 	    }
-	}else
-	    dot_index = strlen(ip_addr);
-
-	/* Make one string in the copied buffer */
-	copied_ip_addr[dot_index] = '\0';
-	/* And, save it as an one string */
-	p = &copied_ip_addr[start_pos];
-
-	dec_val = nfc_strtol(p, &success);
-
-	if (!success){
-	    printf("invalid input string for ip v4 format\n");
-	    exit(-1);
 	}
 
-	convert_octet_decimal_to_binary(dec_val, one_octet_binary_format);
+	/* Make one string, by utilizing the copied buffer */
+	p = &copied_ip_addr[start_pos];
+	copied_ip_addr[dot_index] = '\0';
 
-	printf("%d was convert to binary format %s\n",
-	       dec_val, one_octet_binary_format);
+	/* Make ready for the buffer of a new octet string */
+	all_binary_octets[iter][OCTET_SIZE - 1] = '\0';
+
+	/* Convert the string decimal value to binary format */
+	decimal_val = nfc_strtol(p, &success);
+	if (!success){
+	    fprintf(stderr, "failed to convert a parsed string\n");
+	    return;
+	}
+	convert_octet_decimal_to_binary(decimal_val, all_binary_octets[iter]);
 
 	start_pos = dot_index + 1;
-
-	dec_octet_ary[i] = one_octet_binary_format;
-	printf("dec_octet_ary[%d]=%s\n", i, dec_octet_ary[i]);
     }
 
-    printf("debug : %i => %p\n", 0, dec_octet_ary[0]);
-    printf("debug : %i => %p\n", 1, dec_octet_ary[1]);
     snprintf(output_buffer, IPV4_BIN_SIZE, "%s.%s.%s.%s",
-    	     dec_octet_ary[0], dec_octet_ary[1],
-    	     dec_octet_ary[2], dec_octet_ary[3]);
+	     all_binary_octets[0], all_binary_octets[1],
+	     all_binary_octets[2], all_binary_octets[3]);
 }
 
 void

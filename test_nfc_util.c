@@ -68,20 +68,18 @@ test_binary_format_ipaddr(void)
     /* Class A */
     ip = "10.67.95.255";
     get_binary_format_ipaddr(ip, buf);
-    printf("ip v4 : %s, binary format : %s\n",
-	   ip, buf);
+    compare_strings("00001010.01000011.01011111.11111111",
+		    buf);
     
     /* Class B */
     ip = "172.16.45.8";
     get_binary_format_ipaddr(ip, buf);
-    printf("ip v4 : %s, binary format : %s\n",
-	   ip, buf);
+    compare_strings("10101100.00010000.00101101.00001000", buf);
 
     /* Class C */
     ip = "192.168.1.128";
     get_binary_format_ipaddr(ip, buf);
-    printf("ip v4 : %s, binary format : %s\n",
-	   ip, buf);
+    compare_strings("11000000.10101000.00000001.10000000", buf);
 }
 
 int
