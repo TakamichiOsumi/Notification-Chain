@@ -14,7 +14,7 @@ compare_strings(char *expected, char *result, int compare_length){
 }
 
 static void
-test_subnet_mask(void){
+test_subnet_mask_binary_conversion(void){
     char bit_ipv4[IPV4_BIN_SIZE];
 
     get_binary_format_subnet_mask(24, bit_ipv4);
@@ -28,7 +28,7 @@ test_subnet_mask(void){
 }
 
 static void
-test_broadcast_address_calculation(){
+test_one_octet_binary_conversion(){
     char bit_flags[OCTET + 1]; /* include "\0" */
 
     memset(bit_flags, '\0', OCTET_SIZE);
@@ -56,7 +56,7 @@ test_subnet_cardinality_calculation(){
 }
 
 void
-test_binary_format_ipaddr(void)
+test_ipaddr_binary_conversion(void)
 {
     char *ip;
     char buf[IPV4_BIN_SIZE];
@@ -83,7 +83,7 @@ test_binary_format_ipaddr(void)
 }
 
 void
-test_network_id(void){
+test_network_id_calculation(void){
     char AND_op_result[IPV4_BIN_SIZE];
     char *ip, *answer_networkid, mask;
     int len1, len2;
@@ -123,7 +123,7 @@ test_network_id(void){
 }
 
 void
-test_broadcast_address(void){
+test_broadcast_address_calculation(void){
     char *ip;
     char mask;
     char *answer_broadcast_ip, broadcast_ip[IPV4_DEC_MAX_SIZE];
@@ -169,7 +169,7 @@ compare_integers(char *ip, unsigned int value){
 }
 
 void
-test_ip_equivalent_integer(void){
+test_ip_equivalent_integer_calculation(void){
     compare_integers("192.168.60.70", 3232250950);
     compare_integers("10.10.128.100", 168460388);
 }
@@ -177,13 +177,13 @@ test_ip_equivalent_integer(void){
 int
 main(int argc, char **argv){
 
-    test_subnet_mask();
-    test_binary_format_ipaddr();
-    test_broadcast_address_calculation();
+    test_subnet_mask_binary_conversion();
+    test_ipaddr_binary_conversion();
+    test_one_octet_binary_conversion();
     test_subnet_cardinality_calculation();
-    test_network_id();
-    test_broadcast_address();
-    test_ip_equivalent_integer();
+    test_network_id_calculation();
+    test_broadcast_address_calculation();
+    test_ip_equivalent_integer_calculation();
 
     return 0;
 }
