@@ -159,13 +159,12 @@ find_dot_index(char *str, int start, int end){
  */
 void
 get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
-    char *p, copied_ip_addr[IPV4_DEC_MAX_SIZE],
-	all_binary_octets[NUM_OF_OCTETS][OCTET_SIZE];
-    int iter, decimal_val, start_pos = 0, dot_index,
-	last_char_index = strlen(ip_addr) - 1;
+    char *p, copied_ip_addr[IPV4_DEC_MAX_SIZE];
+    char binary_octets[NUM_OF_OCTETS][OCTET_SIZE];
+    int iter, decimal_val, dot_index, start_pos = 0;
     bool success = false;
 
-    /* Create a copied input to make the output */
+    /* Create a copied input to make each octet separate */
     strncpy(copied_ip_addr, ip_addr, IPV4_DEC_MAX_SIZE);
 
     /*
@@ -179,7 +178,7 @@ get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
 	    dot_index = strlen(ip_addr);
 	}else{
 	    if ((dot_index = find_dot_index(copied_ip_addr,
-					start_pos, last_char_index)) == -1){
+					    start_pos, strlen(ip_addr) - 1)) == -1){
 		fprintf(stderr, "invalid input string for ip v4 format\n");
 		return;
 	    }
@@ -190,7 +189,7 @@ get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
 	copied_ip_addr[dot_index] = '\0';
 
 	/* Make ready for the buffer of a new octet string */
-	all_binary_octets[iter][OCTET_SIZE - 1] = '\0';
+	binary_octets[iter][OCTET_SIZE - 1] = '\0';
 
 	/* Convert the string decimal value to binary format */
 	decimal_val = nfc_strtol(p, &success);
@@ -198,14 +197,16 @@ get_binary_format_ipaddr(char *ip_addr, char *output_buffer){
 	    fprintf(stderr, "failed to convert a parsed string\n");
 	    return;
 	}
-	convert_octet_decimal_to_binary(decimal_val, all_binary_octets[iter]);
+	convert_octet_decimal_to_binary(decimal_val, binary_octets[iter]);
 
+	/* For the next iteration, shift the start position to search dots */
 	start_pos = dot_index + 1;
     }
 
+    /* Build the output string */
     snprintf(output_buffer, IPV4_BIN_SIZE, "%s.%s.%s.%s",
-	     all_binary_octets[0], all_binary_octets[1],
-	     all_binary_octets[2], all_binary_octets[3]);
+	     binary_octets[0], binary_octets[1],
+	     binary_octets[2], binary_octets[3]);
     output_buffer[IPV4_BIN_SIZE - 1] = '\0';
 }
 
