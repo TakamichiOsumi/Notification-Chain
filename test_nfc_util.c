@@ -170,8 +170,20 @@ compare_integers(char *ip, unsigned int value){
 
 void
 test_ip_equivalent_integer_calculation(void){
-    compare_integers("192.168.60.70", 3232250950);
-    compare_integers("10.10.128.100", 168460388);
+    char output_buffer[IPV4_DEC_MAX_SIZE];
+    unsigned int input;
+
+    /* Test 1 */
+    input = 3232250950;
+    compare_integers("192.168.60.70", input);
+    get_abcd_ip_format(input, output_buffer);
+    compare_strings("192.168.60.70", output_buffer, IPV4_DEC_MAX_SIZE);
+
+    /* Test 2 */
+    input =  168460388;
+    compare_integers("10.10.128.100", input);
+    get_abcd_ip_format(input, output_buffer);
+    compare_strings("10.10.128.100", output_buffer, IPV4_DEC_MAX_SIZE);
 }
 
 int

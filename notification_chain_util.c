@@ -244,6 +244,7 @@ get_broadcast_address(char *ip_addr, char mask, char *output_buffer){
     int i;
 
     output_buffer[0] = '\0';
+
     memset(network_id, '\0', IPV4_DEC_MAX_SIZE);
     memset(binary_network_id, '\0', IPV4_BIN_SIZE);
     memset(mask_complement, '\0', IPV4_BIN_SIZE);
@@ -324,10 +325,30 @@ get_ip_integer_equivalent(char *ip_address, bool *valid){
     return result;
 }
 
+/*
+ * The caller must ensure 'output_buffer' has the length of IPV4_DEC_MAX_SIZE.
+ */
 void
 get_abcd_ip_format(unsigned int ip_address, char *output_buffer){
-}
+    int i;
+    unsigned int remainder, quotient, divisor, copied_ip_address;
+    int tmp_dec_buffer[4]; /* for decimal values of all octets */
 
+    copied_ip_address = ip_address;
+    memset(output_buffer, '\0', IPV4_DEC_MAX_SIZE);
+
+    for (i = NUM_OF_OCTETS - 1; i >= 0; i--){
+	divisor = pow(256, (i));
+	quotient = copied_ip_address / divisor;
+	remainder = copied_ip_address % divisor;
+	copied_ip_address = copied_ip_address - (quotient * divisor);
+	tmp_dec_buffer[i] = quotient;
+    }
+
+    snprintf(output_buffer, IPV4_DEC_MAX_SIZE, "%d.%d.%d.%d",
+	     tmp_dec_buffer[3], tmp_dec_buffer[2],
+	     tmp_dec_buffer[1], tmp_dec_buffer[0]);
+}
 
 /*
  * The caller must ensure 'output_buffer' has the length of IPV4_DEC_MAX_SIZE.
