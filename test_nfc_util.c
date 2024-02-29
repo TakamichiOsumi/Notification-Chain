@@ -186,6 +186,18 @@ test_ip_equivalent_integer_calculation(void){
     compare_strings("10.10.128.100", output_buffer, IPV4_DEC_MAX_SIZE);
 }
 
+void
+test_ip_memberships(){
+    if (check_ip_subnet_membership("192.168.1.0", 24, "192.168.1.2") != 1)
+	exit(-1);
+
+    if (check_ip_subnet_membership("192.168.1.0", 24, "192.168.1.3") != 1)
+	exit(-1);
+
+    if (check_ip_subnet_membership("192.168.1.0", 24, "192.168.1.4") != 1)
+	exit(-1);
+}
+
 int
 main(int argc, char **argv){
 
@@ -196,6 +208,7 @@ main(int argc, char **argv){
     test_network_id_calculation();
     test_broadcast_address_calculation();
     test_ip_equivalent_integer_calculation();
+    test_ip_memberships();
 
     return 0;
 }

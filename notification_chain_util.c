@@ -447,5 +447,37 @@ get_subnet_cardinality(char mask){
 
 int
 check_ip_subnet_membership(char *network_id, char mask, char *check_ip){
-    return 0;
+    char broadcast_decimal_ip[IPV4_BIN_SIZE];
+    unsigned int int_network_ip, int_broadcast_ip, target_ip;
+    bool valid;
+
+    int_network_ip = get_ip_integer_equivalent(network_id, &valid);
+    if (valid != true){
+	fprintf(stderr,
+		"invalid input for the conversion of ip address to integer. the ip was %s\n",
+		network_id);
+	exit(-1);
+    }
+
+    get_broadcast_address(network_id, mask, broadcast_decimal_ip);
+    int_broadcast_ip = get_ip_integer_equivalent(broadcast_decimal_ip, &valid);
+    if (valid != true){
+	fprintf(stderr,
+		"invalid input for the conversion of ip address to integer. the ip was %s\n",
+		broadcast_decimal_ip);
+	exit(-1);
+    }
+
+    target_ip = get_ip_integer_equivalent(check_ip, &valid);
+    if (valid != true){
+	fprintf(stderr,
+		"invalid input for the conversion of ip address to integer. the ip was %s\n",
+		check_ip);
+	exit(-1);
+    }
+
+    if (int_network_ip <= target_ip && target_ip <= int_broadcast_ip)
+	return 1;
+    else
+	return 0;
 }
