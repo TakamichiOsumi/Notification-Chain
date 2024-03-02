@@ -1,6 +1,6 @@
 # Notification-Chain
 
-Tiny sets of program to understand the notification chain mechanism.
+Mini project to understand the notification chain mechanism.
 
 Notification chain is a common event-driven architecture between two role of entities - *publisher* and *subscriber*.
 
